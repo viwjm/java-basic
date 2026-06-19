@@ -2,8 +2,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * CVID(문자 동영상) 플레이어.
@@ -48,15 +46,18 @@ public class Player {
 
         // ── 3. 본문 숫자 파싱 ─────────────────────────────────────────
         String[] tokens = body.split(",");
-        List<Integer> nums = new ArrayList<>();
+        // tokens.length 가 숫자의 최대 개수(상한선)이므로 그만큼 배열을 잡아둔다.
+        // 빈 토큰은 건너뛰므로 실제로 채운 개수는 count 로 따로 센다.
+        int[] nums = new int[tokens.length];
+        int count = 0;
         for (String t : tokens) {
             t = t.trim();              // 앞뒤 공백/줄바꿈 제거
             if (t.isEmpty()) continue; // 마지막 쉼표 뒤 빈 토큰 등은 무시
-            nums.add(Integer.parseInt(t));
+            nums[count++] = Integer.parseInt(t);
         }
 
         int pixelsPerFrame = width * height;
-        int frameCount = nums.size() / pixelsPerFrame;
+        int frameCount = count / pixelsPerFrame;
 
         if (frameCount == 0) {
             System.out.println("프레임을 만들 수 없습니다. 숫자 개수를 확인하세요.");
@@ -69,7 +70,7 @@ public class Player {
         for (int f = 0; f < frameCount; f++) {
             for (int y = 0; y < height; y++) {      // 위 -> 아래
                 for (int x = 0; x < width; x++) {   // 왼쪽 -> 오른쪽
-                    video[f][y][x] = nums.get(idx++);
+                    video[f][y][x] = nums[idx++];
                 }
             }
         }
